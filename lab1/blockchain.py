@@ -87,7 +87,7 @@ blockchain = Blockchain()
 print("Попередній блок...")
 print(json.dumps(blockchain.last_block_LMG, indent=4))
 
-print("\nМайнинг...")
+print("\nЗнаходження нового PoW...")
 last_block_proof = blockchain.last_block_LMG['proof']
 new_proof = blockchain.proof_of_work_LMG(last_block_proof)
 
