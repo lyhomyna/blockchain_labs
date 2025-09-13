@@ -25,7 +25,7 @@ class Blockchain(object):
             'timestamp': time(),
             'transactions': self.current_transactions_LMG,
             'proof': proof,
-            'previous_hash': previous_hash or self.hash(self.chain_LMG[-1]),
+            'previous_hash': previous_hash or self.hash_LMG(self.chain_LMG[-1]),
         }
 
         self.current_transactions_LMG = []
