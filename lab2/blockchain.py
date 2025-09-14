@@ -22,14 +22,18 @@ class Blockchain(object):
         :return: <dict> New block
         """
 
+        merkle_root = self.generate_merkle_root(self.current_transactions_LMG)
+
         block = {
             'index': len(self.chain_LMG) + 1,
             'timestamp': time(),
+            'merkle_root': merkle_root,
             'transactions': self.current_transactions_LMG,
             'proof': proof,
             'previous_hash': previous_hash or self.hash_LMG(self.chain_LMG[-1]),
         }
 
+        # Clear mempool
         self.current_transactions_LMG = []
         self.chain_LMG.append(block)
 
@@ -53,15 +57,35 @@ class Blockchain(object):
         return self.last_block_LMG['index'] + 1
 
     @staticmethod
-    def hash_LMG(block):
+    def hash_LMG(data_object):
         """
-        Creates SHA-256 block hash
+        Creates SHA-256 hash
         :param block: <dict> Block
         :return: <str> hashsum
         """
 
-        block_string = json.dumps(block, sort_keys=True).encode()
+        block_string = json.dumps(data_object, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
+
+    @staticmethod
+    def generate_merkle_root(transactions):
+        if not transactions:
+            return hashlib.sha256("".encode()).hexdigest()
+
+        leaves = [Blockchain.hash_LMG(tx) for tx in transactions]
+
+        while len(leaves) > 1:
+            if len(leaves) % 2 != 0:
+                leaves.append(leaves[-1])
+
+            new_lvl = []
+            for i in range(0, len(leaves), 2):
+                combined_hash = hashlib.sha256(f'{leaves[i]}{leaves[i+1]}'.encode()).hexdigest()
+                new_lvl.append(combined_hash)
+
+            leaves = new_lvl
+
+        return leaves[0]
 
     @property
     def last_block_LMG(self):
