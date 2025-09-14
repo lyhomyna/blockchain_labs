@@ -134,8 +134,9 @@ def mine():
     previous_hash = blockchain.hash_LMG(last_block)
     block = blockchain.new_block_LMG(proof, previous_hash)
     response = {
-        'message':"New Block Forged",
         'index':block['index'],
+        'timestamp':block['timestamp'],
+        'merkle_root': block['merkle_root'],
         'transactions':block['transactions'],
         'proof':block['proof'],
         'previous_hash':block['previous_hash'],
