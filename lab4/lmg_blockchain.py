@@ -1,5 +1,6 @@
 import hashlib
 import json
+import sys
 import requests
 
 from time import time
@@ -170,16 +171,22 @@ class Blockchain(object):
             response = requests.get(f'http://{node}/chain')
 
             if response.status_code == 200:
-                length = response.json()['lenght']
+                print("DEBUG: response code is 200")
+                length = response.json()['length']
                 chain = response.json()['chain']
                 
+                print(f'DEBUG: node "{node}" has length "{length}"')
+                print(f'DEBUG: node "{node}" has chain "{chain}"')
+
                 # Check if the lenght is the longest and the chain is valid
                 if length > max_length and self.valid_chain(chain):
+                    print(f'DEBUG: node "{node}": {length} > {max_length} and chain is valid')
                     max_length = length
                     new_chain = chain
 
                 # Replace chain if longer and valid is found
                 if new_chain:
+                    print(f'DEBUG: replace current chain with a new one')
                     self.chain = new_chain
                     return True
 
@@ -258,6 +265,7 @@ def register_nodes():
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_conflicts_LMG()
+    print(f'replaced is: {replaced}')
 
     if replaced:
         response = {
@@ -267,7 +275,7 @@ def consensus():
     else:
         response = {
             'message': 'Our chain is authoritative',
-            'chain': blockchain.chain
+            'chain': blockchain.chain_LMG
         }
 
     return jsonify(response), 200
@@ -275,4 +283,5 @@ def consensus():
 
 if __name__ == '__main__':
     print("Starting server...")
-    app.run(host='0.0.0.0', port=5000)
+    port = int(sys.argv[1])
+    app.run(host='0.0.0.0', port=port)
