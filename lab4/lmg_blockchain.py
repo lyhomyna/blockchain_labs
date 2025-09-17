@@ -124,7 +124,7 @@ class Blockchain(object):
         parsed_url = urlparse(address)
         self.nodes_LMG.add(parsed_url.netloc)
 
-    def valid_chain(self, chain):
+    def valid_chain_LMG(self, chain):
         """
         Verify whether added hash into block is correct
 
@@ -137,9 +137,9 @@ class Blockchain(object):
 
         while current_index < len(chain):
             block = chain[current_index]
-            print(f'{last_block}')
-            print(f'{block}')
-            print("\n\n")
+            # print(f'{last_block}')
+            # print(f'{block}')
+            # print("\n\n")
 
             # Checking the correctness of the block hash
             if block['previous_hash'] != self.hash_LMG(last_block):
@@ -151,6 +151,8 @@ class Blockchain(object):
 
             last_block = block
             current_index += 1
+
+        return True
 
     def resolve_conflicts_LMG(self):
         """
@@ -171,23 +173,17 @@ class Blockchain(object):
             response = requests.get(f'http://{node}/chain')
 
             if response.status_code == 200:
-                print("DEBUG: response code is 200")
                 length = response.json()['length']
                 chain = response.json()['chain']
                 
-                print(f'DEBUG: node "{node}" has length "{length}"')
-                print(f'DEBUG: node "{node}" has chain "{chain}"')
-
                 # Check if the lenght is the longest and the chain is valid
-                if length > max_length and self.valid_chain(chain):
-                    print(f'DEBUG: node "{node}": {length} > {max_length} and chain is valid')
+                if length > max_length and self.valid_chain_LMG(chain):
                     max_length = length
                     new_chain = chain
 
                 # Replace chain if longer and valid is found
                 if new_chain:
-                    print(f'DEBUG: replace current chain with a new one')
-                    self.chain = new_chain
+                    self.chain_LMG = new_chain
                     return True
 
         return False
